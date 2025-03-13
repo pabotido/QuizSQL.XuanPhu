@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Giải Đề Trắc Nghiệm</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <div class="container">
+        <h2>Giải Đề Trắc Nghiệm</h2>
+        <div class="control-panel">
+            <label for="quizSelector">Chọn đề:</label>
+            <select id="quizSelector">
+                <option value="1">Đề 1</option>
+                <option value="2">Đề 2</option>
+                <option value="3">Đề 3</option>
+                <option value="4">Chương 2: Mô hình DL QH</option>
+            </select>
+            <button id="startBtn" onclick="loadQuestions()">Bắt đầu</button>
+        </div>
+        <div id="timer"></div>
+        <div id="highScore"></div>
+        <form id="quizForm">
+            <div id="questionsContainer"></div>
+        </form>
+        <div id="finalScore"></div>
+        <div id="reviewSection">
+            <h3>Kết quả của bạn</h3>
+            <div id="reviewContent"></div>
+        </div>
+        <button id="restartBtn" onclick="restartQuiz()">Làm lại</button>
+    </div>
+    <footer>
+        © 2025 - Phát triển bởi <a href="#">Xuân Phú</a>. All rights reserved.
+    </footer>
+
+    <script>
+        let quizzes = {
+            "1": [
+                { id: "q1", text: "Thế nào là cơ sở dữ liệu quan hệ?", answers: {"A": "Cơ sở dữ liệu được xây dựng dựa trên mô hình dữ liệu quan hệ", "B": "Cơ sở dữ liệu dùng để tạo lập, cập nhật và khai thác CSDL quan hệ", "C": "Cơ sở dữ liệu được xây dựng dựa trên mô hình dữ liệu quan hệ và khai thác CSDL quan hệ", "D": "Cơ sở dữ liệu dùng để tạo lập, cập nhật và khai thác CSDL quan hệ dựa trên mô hình dữ liệu quan hệ"}, correct: "A" },
+                { id: "q2", text: "Trong các phần mềm sau đây, phần mềm nào không phải là hệ quản trị CSDL quan hệ?", answers: {"A": "Microsoft Excel", "B": "Microsoft Access", "C": "Microsoft SQL Server", "D": "Oracle"}, correct: "A" },
+                { id: "q3", text: "An toàn dữ liệu có thể hiểu là?", answers: {"A": "Dễ dàng cho công việc bảo trì dữ liệu", "B": "Ngăn chặn các truy nhập trái phép, sai quy định từ trong ra hoặc từ ngoài vào", "C": "Thống nhất các tiêu chuẩn, thủ tục và các biện pháp bảo vệ, an toàn dữ liệu", "D": "Tính nhất quán và toàn vẹn dữ liệu"}, correct: "B" },
+                { id: "q4", text: "Mục tiêu của cơ sở dữ liệu là?", answers: {"A": "Không làm thay đổi chiến lược truy nhập cơ sở dữ liệu", "B": "Bảo đảm tính độc lập dữ liệu", "C": "Không làm thay đổi cấu trúc lưu trữ dữ liệu", "D": "Tính nhất quán và toàn vẹn dữ liệu"}, correct: "B" },
+                { id: "q5", text: "Hệ quản trị CSDL DBMS (DataBase Management System) là?", answers: {"A": "Hệ thống phần mềm điều khiển các chiến lược truy nhập và tổ chức lưu trữ cơ sở dữ liệu", "B": "Tạo cấu trúc dữ liệu tương ứng với mô hình dữ liệu", "C": "Cập nhật, chèn thêm, loại bỏ hay sửa đổi dữ liệu mức tệp", "D": "Đảm bảo an toàn, bảo mật dữ liệu và tính toàn vẹn dữ liệu"}, correct: "A" },
+                { id: "q6", text: "Cơ sở dữ liệu là:", answers: {"A": "Một bộ sưu tập rất lớn về các loại dữ liệu tác nghiệp, lưu trữ theo quy tắc nhất định nào đó", "B": "Một bộ sưu tập rất lớn về các loại dữ liệu tác nghiệp", "C": "Tập các File dữ liệu tác nghiệp", "D": "Kho dữ liệu tác nghiệp"}, correct: "A" },
+                { id: "q7", text: "Cơ sở dữ liệu là tài nguyên thông tin chung, nghĩa là:", answers: {"A": "Truy nhập trực tuyến", "B": "Nhiều người sử dụng, không phụ thuộc vị trí địa lý, có phân quyền", "C": "Nhiều người sử dụng", "D": "Nhiều người sử dụng, có phân quyền"}, correct: "B" },
+                { id: "q8", text: "Hệ quản trị CSDL - HQTCSDL (DataBase Management System - DBMS) là:", answers: {"A": "Hệ điều hành", "B": "Các phần mềm hệ thống", "C": "Phần mềm điều khiển các chiến lược truy nhập CSDL", "D": "Các phần mềm ứng dụng"}, correct: "C" },
+                { id: "q9", text: "Người quản trị CSDL là?", answers: {"A": "Quyết định cấu trúc lưu trữ & chiến lược truy nhập", "B": "Xác định chiến lược lưu trữ, sao chép, phục hồi dữ liệu", "C": "Cho phép người sử dụng những quyền truy nhập cơ sở dữ liệu", "D": "Dữ liệu không bị thay đổiMột người hay một nhóm người có khả năng chuyên môn cao về tin học, có trách nhiệm quản lý và điều khiển toàn bộ hoạt động của các hệ CSDL"}, correct: "D" },
+                { id: "q10", text: "Chọn một khẳng định nào sau đây là đúng nhất khi nói về đối tượng nghiên cứu CSDL", answers: {"A": "Dữ liệu luôn chính xác", "B": "Dữ liệu không bị mất", "C": "Trong CSDL quan hệ có nhiều cách biểu diễn dữ liệu", "D": "Mối quan hệ giữa các thực thể cũng là một loại thực thể"}, correct: "B" },
+                { id: "q11", text: "Chọn một khẳng định nào sau đây là đúng nhất khi nói về ưu điểm tổ chức lưu trữ dữ liệu theo lý thuyết cơ sở dữ liệu?", answers: {"A": "Tốn kém, lãng phí bộ nhớ và các thiết bị lưu trữ", "B": "Cho phép chia sẻ tài nguyên thông tin và giảm dư thừa trong lưu trữ", "C": "Nhiều thuộc tính được mô tả và lưu trữ nhiều lần độc lập với nhau", "D": "Giảm dư thừa dữ liệu trong lưu trữ"}, correct: "B" }
+            
+            ],
+            "2": [
+                { id: "q1", text: "Ưu điểm của cơ sở dữ liệu là?", answers: {"A": "Giảm dư thừa, nhất quán và toàn vẹn của dữ liệu", "B": "Các thuộc tính được mô tả trong nhiều tệp dữ liệu khác nhau", "C": "Khả năng xuất hiện mâu thuẫn và không nhất quán dữ liệu", "D": "Xuất hiện dị thường thông tin"}, correct: "A" },
+                { id: "q2", text: "'Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Tính độc lập dữ liệu là ....' của các hệ ứng dụng đối với sự thay đổi trong cấu trúc lưu trữ và chiến lược truy nhập dữ liệu?", answers: {"A": "Phương thức truy nhập", "B": "Các chiến lược truy nhập", "C": "Nội dung thông tin", "D": "Tính bất biến"}, correct: "D" },
+                { id: "q3", text: "Chức năng quan trọng của các dịch vụ cơ sở dữ liệu là?", answers: {"A": "Cập nhật, sửa đổi, bổ sung dữ liệu", "B": "Khôi phục thông tin", "C": "Tìm kiếm và tra cứu thông tin", "D": "Xử lý: tìm kiếm, tra cứu, sửa đổi, bổ sung hay loại bỏ dữ liệu"}, correct: "D" },
+                { id: "q4", text: "Mô hình ngoài là?", answers: {"A": "Nội dung thông tin của toàn bộ CSDL", "B": "Nội dung thông tin của một phần dữ liệu dưới cách nhìn của người sử dụng", "C": "Nội dung thông tin của toàn bộ CSDL dưới cách nhìn của người sử dụng", "D": "Nội dung thông tin của một phần cơ sở dữ liệu"}, correct: "B" },
+                { id: "q5", text: "Mô hình quan niệm là?", answers: {"A": "Cách nhìn dữ liệu ở mức ngoài", "B": "Nội dung thông tin của một phần dữ liệu dưới cách nhìn của người sử dụng", "C": "Cách nhìn dữ liệu một cách tổng quát của người sử dụng", "D": "Nội dung thông tin của một phần dữ liệu"}, correct: "B" },
+                { id: "q6", text: "Mô hình trong là?", answers: {"A": "Mô hình biểu diễn cơ sở dữ liệu trừu tượng ở mức quan niệm", "B": "Có nhiều cách biểu diễn CSDL dưới dạng lưu trữ vật lý", "C": "Mô hình lưu trữ vật lý dữ liệu", "D": "Là một trong các mô hình biểu diễn CSDL dưới dạng lưu trữ vật lý"}, correct: "B" },
+                { id: "q7", text: "Mô hình CSDL phân cấp là mô hình?", answers: {"A": "Dữ liệu được biểu diễn bằng con trỏ", "B": "Dữ liệu được biểu diễn bằng cấu trúc cây", "C": "Dữ liệu được biểu diễn bằng mối quan hệ thực thể", "D": "Dữ liệu được biểu diễn bằng bảng"}, correct: "B" },
+                { id: "q8", text: "Đặc trưng cấu trúc của mô hình mạng là?", answers: {"A": "Chứa các liên kết một - một và một - nhiều", "B": "Chứa các liên kết một - một, một - nhiều và nhiều - nhiều", "C": "Chứa các liên kết một - một, một - nhiều và nhiều - nhiều", "D": "Chứa các liên kết nhiều - một và một - nhiều"}, correct: "A" },
+                { id: "q9", text: "Mô hình cơ sở dữ liệu Client-Server?", answers: {"A": "Máy chủ và máy đều tham gia quá trình xử lý", "B": "Máy khách thực hiện các ứng dụng, nó gửi yêu cầu về máy chủ được kết nối với cơ sở dữ liệu, máy chủ xử lý và gửi trả lại kết quả về máy khách", "C": "Máy khách yêu cầu máy chủ cung cấp các loại dịch vụ", "D": "Các máy khách chia sẻ gánh nặng xử lý của máy chủ trung tâm"}, correct: "B" },
+                { id: "q10", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Người quản trị CSDL bảo đảm việc truy nhập CSDL. Kiểm tra, kiểm soát các quyền truy nhập của .... Ngăn chặn các truy nhập trái phép, sai quy định từ trong ra hoặc từ ngoài vào?", answers: {"A": "Hệ quản trị cơ sở dữ liệu", "B": "Người quản trị cơ sở dữ liệu", "C": "Hệ ứng dụng", "D": "Người sử dụng"}, correct: "B" },
+                { id: "q11", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Tính độc lập dữ liệu là '.... của các hệ ứng dụng đối với sự thay đổi trong cấu trúc lưu trữ và chiến lược truy nhập dữ liệu'?", answers: {"A": "Nội dung thông tin", "B": "Phương thức truy nhập", "C": "Tính bất biến", "D": "Các chiến lược truy nhập"}, correct: "C" }
+            ],
+            "3":[
+                { id: "q1", text: "Chọn một khẳng định sau đây là đúng nhất?", answers: {"A": "Sự không nhất quán dữ liệu trong lưu trữ làm cho dữ liệu mất đi tính toàn vẹn", "B": "Tính toàn vẹn dữ liệu đảm bảo dữ liệu luôn luôn đúng", "C": "Tính nhất quán dữ liệu đảm bảo cho sự cập nhật, bổ sung dễ dàng", "D": "Tổ chức lưu trữ theo lý thuyết cơ sở dữ liệu, các thuộc tính có thể lặp lại"}, correct: "B" },
+                { id: "q2", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Toàn vẹn dữ liệu nghĩa là?", answers: {"A": "Có thể thực hiện các chiến lược truy nhập dữ liệu", "B": "Dữ liệu trong CSDL luôn luôn chính xác tại mọi thời điểm", "C": "Có thể tìm kiếm tại mọi thời điểm", "D": "Đảm bảo tính độc lập dữ liệu tại mọi thời điểm"}, correct: "B" },
+                { id: "q3", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Hình thức thông dụng nhất để nhận biết người sử dụng là mật khẩu ...?", answers: {"A": "Đảm bảo toàn vẹn dữ liệu", "B": "Chỉ có hệ thống và người sử dụng biết", "C": "Mới được phép truy nhập CSDL", "D": "Và các quy tắc bảo vệ cơ sở dữ liệu"}, correct: "B" },
+                { id: "q4", text: "Người sử dụng có thể truy nhập?", answers: {"A": "Một phần cơ sở dữ liệu", "B": "Phụ thuộc vào quyền truy nhập", "C": "Toàn bộ cơ sở dữ liệu", "D": "Hạn chế"}, correct: "B" },
+                { id: "q5", text: "Mô hình dữ liệu nào có khả năng hạn chế sự dư thừa dữ liệu tốt hơn?", answers: {"A": "Tất cả các loại mô hình dữ liệu", "B": "Mô hình dữ liệu hướng đối tượng", "C": "Mô hình cơ sở dữ liệu phân cấp", "D": "Mô hình cơ sở dữ liệu phân tán"}, correct: "C" },
+                { id: "q6", text: "Mô hình dữ liệu nào không chấp nhận mối quan hệ nhiều - nhiều?", answers: {"A": "Mô hình dữ liệu mạng", "B": "Cơ sở dữ liệu phân cấp", "C": "Tất cả các mô hình dữ liệu", "D": "Cơ sở dữ liệu phân tán"}, correct: "B" },
+                { id: "q7", text: "Chọn một khẳng định nào sau đây là đúng nhất?", answers: {"A": "Sự không nhất quán dữ liệu trong lưu trữ làm cho dữ liệu mất đi tính toàn vẹn", "B": "Tổ chức lưu trữ theo lý thuyết cơ sở dữ liệu, các thuộc tính có thể lặp lại", "C": "Tính toàn vẹn dữ liệu đảm bảo dữ liệu luôn luôn đúng", "D": "Tính nhất quán dữ liệu đảm bảo cho sự cập nhật, bổ sung dễ dàng"}, correct: "C" },
+                { id: "q8", text: "Chọn một khẳng định nào sau đây là đúng nhất khi nói về các bước triển khai mô hình thực thể quan hệ?", answers: {"A": "Xác định nội dung, yêu cầu của các thực thể", "B": "Phân tích yêu cầu, xác định các thực thể và các mối liên kết, tích hợp yêu cầu, chuyển đổi về các quan hệ, chuẩn hóa dữ liệu và thiết kế vật lý", "C": "Mô tả thông tin về các đối tượng và xác định mối quan hệ giữa các đối tượng cần thiết kế", "D": "Phân tích yêu cầu, xác định các thực thể, chuẩn hóa dữ liệu và thiết kế vật lý"}, correct: "B" },
+                { id: "q9", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Tổ chức lưu trữ dữ liệu theo lý thuyết cơ sở dữ liệu có thể tránh được sự không nhất quán trong lưu trữ dữ liệu và bảo đảm được .... của dữ liệu?", answers: {"A": "Tính toàn vẹn", "B": "Tính độc lập dữ liệu", "C": "An toàn", "D": "Quyền truy nhập cơ sở dữ liệu"}, correct: "A" }
+            ],
+            "4":[
+                { id: "q1", text: "Trường khóa chính là trường?", answers: {"A": "Single Key", "B": "Unique Key", "C": "First Key", "D": "Primary Key"}, correct: "D" },
+                { id: "q2", text: "Thực thể là?", answers: {"A": "Các đối tượng dữ liệu", "B": "Các quan hệ", "C": "Các mối liên kết giữa các đối tượng", "D": "Các đối tượng và mối liên kết giữa các đối tượng"}, correct: "A" },
+                { id: "q3", text: "Thực thể là?", answers: {"A": "Các đối tượng dữ liệu", "B": "Các quan hệ", "C": "Các mối liên kết giữa các đối tượng", "D": "Các đối tượng và mối liên kết giữa các đối tượng"}, correct: "C" },
+                { id: "q4", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Hợp các quan hệ khả hợp trên cùng tập các thuộc tính U là một quan hệ trên U, các bộ là .........., bỏ đi các bộ trùng nhau, chỉ giữ lại những bộ đại diện?", answers: {"A": "Các bộ của các quan hệ nguồn thỏa điều kiện hợp", "B": "Các bộ của các quan hệ nguồn", "C": "Các bộ của các quan hệ nguồn được tách không tổn thất thông tin", "D": "Các bộ có mặt trong các quan hệ nguồn"}, correct: "C" },
+                { id: "q5", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Giao của các quan hệ trên U cũng là một quan hệ trên U, các bộ của nó là các bộ ....?", answers: {"A": "Có mặt trong các quan hệ nguồn", "B": "Của các quan hệ nguồn thỏa tận từ xác định", "C": "Có mặt ở tất cả các quan hệ nguồn", "D": "Các quan hệ nguồn được tách không tổn thất thông tin"}, correct: "B" },
+                { id: "q6", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Tích Đề các quan hệ là một quan hệ, với tập các thuộc tính là ......., các bộ bao gồm các bộ quan hệ nguồn nối tiếp theo thứ tự phép nhân?", answers: {"A": "Hợp tập các thuộc tính của các quan hệ nguồn", "B": "Thuộc tính có mặt trong quan hệ đầu tiên phép nhân", "C": "Giao tập các thuộc tính của các quan hệ nguồn", "D": "Tập các thuộc tính của các quan hệ tách"}, correct: "C" },
+                { id: "q7", text: "Hãy chọn từ/cụm từ tương ứng để hoàn thiện khẳng định sau: Cơ sở dữ liệu quan hệ được biểu diễn ...., các cột là thuộc tính và các hàng là tập n giá trị của thực thể, đối tượng?", answers: {"A": "Dưới dạng các File dữ liệu", "B": "Cấu trúc hình cây", "C": "Dưới dạng các bảng", "D": "Cấu trúc hình mạng"}, correct: "C" },
+                { id: "q8", text: "Chọn một khẳng định nào sau đây là đúng nhất khi nói về phép giao?", answers: {"A": "Thuộc tính của quan hệ giao là giao các thuộc tính của các quan hệ nguồn", "B": "Giao của các quan hệ là một quan hệ", "C": "Các bộ của quan hệ giao là giao các bộ của các quan hệ nguồn", "D": "Giao của các quan hệ khả hợp là một quan hệ khả hợp"}, correct: "C" },
+                { id: "q9", text: "Chọn một khẳng định nào sau đây là đúng nhất khi nói về phép trừ?", answers: {"A": "Hiệu của các quan hệ cũng là quan hệ", "B": "Các bộ quan hệ kết quả là các bộ của các quan hệ nguồn", "C": "Các quan hệ tham gia phép trừ không cần phải khả hợp", "D": "Hiệu của các quan hệ khả hợp cũng là quan hệ khả hợp"}, correct: "B" },
+                { id: "q10", text: "Cho 2 quan hệ r(A,B) = {(a1, b1), (a2, b1), (a1, b2)} và s(A,B) = {(a2, b1), (a2, b2)}. Khi đó phép hợp r ∪ s sẽ có kết quả?", answers: {"A": "{(a2, b1)}", "B": "{(a1, b1), (a2, b1), (a1, b2), (a2, b2)}", "C": "{(a1, b1), (a1, b2), (a2, b2)}", "D": "none"}, correct: "B" },
+                { id: "q11", text: "Cho 2 quan hệ r(A,B) = {(a1, b1), (a2, b1), (a1, b2)} và s(A,B) = {(a2, b1), (a2, b2)}. Khi đó phép giao r ∩ s sẽ có kết quả?", answers: {"A": "{(a2, b1)}", "B": "{(a1, b1), (a2, b1), (a1, b2), (a2, b2)}", "C": "{(a1, b1), (a1, b2), (a2, b2)}", "D": "{(a1, b1), (a1, b2)}"}, correct: "A" },
+                { id: "q12", text: "Cho 2 quan hệ r(A,B) = {(a1, b1), (a2, b1), (a1, b2)} và s(A,B) = {(a2, b1), (a2, b2)}. Khi đó phép trừ r - s sẽ có kết quả?", answers: {"A": "{(a1, b1)}", "B": "{(a1, b1), (a2, b1), (a1, b2), (a2, b2)}", "C": "{(a1, b1), (a1, b2), (a2, b2)}", "D": "{(a1, b1), (a1, b2)}"}, correct: "D" },
+                { id: "q13", text: "Cho 2 quan hệ r(A,B) = {(a1, b1), (a2, b1), (a1, b2)} và s(A,B) = {(a2, b1), (a2, b2)}. Khi đó phép trừ s - r sẽ có kết quả?", answers: {"A": "{(a2, b2)}", "B": "{(a1, b1), (a2, b1), (a1, b2), (a2, b2)}", "C": "{(a1, b1), (a1, b2), (a2, b2)}", "D": "{(a2, b1)}"}, correct: "A" }
+
+            ]
+        };
+        let questions = [];
+        let score = 0;
+        let totalQuestions = 0;
+        let allAnswers = [];
+        let timer;
+        let timeLeft = 1500;
+
+        const startSound = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+        const correctSound = new Audio('https://www.soundjay.com/buttons/beep-07.mp3');
+        const wrongSound = new Audio('https://www.soundjay.com/buttons/beep-02.mp3');
+        const endSound = new Audio('https://www.soundjay.com/buttons/beep-03.mp3');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function shuffleAnswers(answers) {
+            let keys = Object.keys(answers);
+            shuffleArray(keys);
+            let newAnswers = {};
+            let labels = ["A", "B", "C", "D"];
+            keys.forEach((key, index) => {
+                newAnswers[labels[index]] = answers[key];
+            });
+            return newAnswers;
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                document.getElementById("timer").innerText = `Thời gian còn lại: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function loadQuestions() {
+            console.log("Start button clicked"); // Debug
+            startSound.play();
+            let selectedQuiz = document.getElementById("quizSelector").value;
+            let quizQuestions = JSON.parse(JSON.stringify(quizzes[selectedQuiz]));
+            
+            shuffleArray(quizQuestions);
+            
+            questions = quizQuestions.map(q => {
+                let shuffledAnswers = shuffleAnswers(q.answers);
+                let correctAnswerKey = Object.keys(shuffledAnswers).find(
+                    key => shuffledAnswers[key] === q.answers[q.correct]
+                );
+                return { ...q, answers: shuffledAnswers, correct: correctAnswerKey };
+            });
+            
+            totalQuestions = questions.length;
+            let container = document.getElementById("questionsContainer");
+            container.innerHTML = "";
+            
+            questions.forEach((question, index) => {
+                let div = document.createElement("div");
+                div.className = "question";
+                if (index === 0) div.classList.add("active");
+                div.id = question.id;
+                
+                let answersHtml = Object.entries(question.answers).map(([key, value]) =>
+                    `<label><input type='radio' name='${question.id}' value='${key}' onclick='checkAnswer(this, "${question.id}", ${index + 1})'> ${key}. ${value}</label>`
+                ).join('');
+                
+                div.innerHTML = `<p><strong>${question.text}</strong></p>` + answersHtml + `<div class='result' id='result${question.id}'></div>`;
+                container.appendChild(div);
+            });
+            
+            document.getElementById("startBtn").style.display = "none";
+            timeLeft = 300;
+            startTimer();
+            updateHighScoreDisplay();
+        }
+
+        function checkAnswer(element, currentId, nextIndex) {
+            let selectedValue = element.value;
+            let question = questions.find(q => q.id === currentId);
+            let resultDiv = document.getElementById(`result${currentId}`);
+            allAnswers.push({ question: question.text, selected: selectedValue, correct: question.correct });
+            
+            if (selectedValue === question.correct) {
+                resultDiv.innerText = "✔ Đúng!";
+                resultDiv.style.color = "var(--correct-color)";
+                score++;
+                correctSound.play();
+            } else {
+                resultDiv.innerText = "✖ Sai!";
+                resultDiv.style.color = "var(--wrong-color)";
+                wrongSound.play();
+            }
+            setTimeout(() => {
+                document.getElementById(currentId).classList.remove("active");
+                if (nextIndex < totalQuestions) {
+                    document.getElementById(questions[nextIndex].id).classList.add("active");
+                } else {
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            document.getElementById("finalScore").innerText = `Bạn đạt ${score}/${totalQuestions} điểm!`;
+            document.getElementById("finalScore").style.display = "block";
+            showAllAnswers();
+            document.getElementById("restartBtn").style.display = "block";
+            document.getElementById("timer").innerText = "Hết giờ!";
+            updateHighScore();
+            endSound.play();
+        }
+
+        function showAllAnswers() {
+            let reviewContent = document.getElementById("reviewContent");
+            reviewContent.innerHTML = allAnswers.map((ans, index) => 
+                `<p>Câu ${index + 1}: ${ans.question}<br>` +
+                `Bạn chọn: ${ans.selected} - Đáp án đúng: ${ans.correct}</p>`
+            ).join('');
+            document.getElementById("reviewSection").style.display = "block";
+        }
+
+        function updateHighScore() {
+            let highScore = localStorage.getItem('highScore') || 0;
+            if (score > highScore) {
+                localStorage.setItem('highScore', score);
+                highScore = score;
+            }
+            updateHighScoreDisplay();
+        }
+
+        function updateHighScoreDisplay() {
+            let highScore = localStorage.getItem('highScore') || 0;
+            document.getElementById("highScore").innerText = `Điểm cao nhất: ${highScore}/${totalQuestions}`;
+        }
+
+        function restartQuiz() {
+            clearInterval(timer);
+            score = 0;
+            allAnswers = [];
+            document.getElementById("finalScore").style.display = "none";
+            document.getElementById("reviewSection").style.display = "none";
+            document.getElementById("restartBtn").style.display = "none";
+            document.getElementById("startBtn").style.display = "block";
+            document.getElementById("questionsContainer").innerHTML = "";
+            document.getElementById("timer").innerText = "";
+            updateHighScoreDisplay();
+        }
+    </script>
+</body>
+</html>
